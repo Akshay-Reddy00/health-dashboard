@@ -9,7 +9,9 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-import type { BloodPressureRecord } from '../types';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { credentials } from '../utils/login';
 
 ChartJS.register(
   CategoryScale,
@@ -21,11 +23,31 @@ ChartJS.register(
   Legend
 );
 
-interface Props {
-  data: BloodPressureRecord[];
-}
 
-export const BloodPressureChart = ({ data }: Props) => {
+export const BloodPressureChart = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [apiData, setApiData] = useState<any>(undefined);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get("https://fedskillstest.coalitiontechnologies.workers.dev", {
+          headers: {
+            Authorization: `Basic ${credentials}`
+          }
+        });
+        setApiData(res.data[3]); 
+        console.log(res.data);
+        console.log("systolicData: ",res.data[3].diagnosis_history);
+      } catch (err) {
+        console.error("Error fetching: ", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
   const chartData = {
     labels: ['Oct, 2023', 'Nov, 2023', 'Dec, 2023', 'Jan, 2024', 'Feb, 2024', 'Mar, 2024'],
     datasets: [

@@ -1,11 +1,34 @@
-import { format } from 'date-fns';
-import type { DiagnosticRecord } from '../types';
+import axios from 'axios';
+import { credentials } from '../utils/login';
+import { DiagnosticRecord } from '../types';
+import { useEffect, useState } from 'react';
 
 interface Props {
   diagnostics: DiagnosticRecord[];
 }
 
 export const DiagnosticList = ({ diagnostics }: Props) => {
+  const [apiDiagnostics, setApiDiagnostics] = useState<DiagnosticRecord[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get("https://fedskillstest.coalitiontechnologies.workers.dev", {
+          headers: {
+            Authorization: `Basic ${credentials}`
+          }
+        });
+        
+        setApiDiagnostics(res.data[3].diagnostic_list);
+        console.log("Diag List: ",res.data[3].diagnostic_list);
+      } catch (err) {
+        console.error("Error fetching: ", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       <h3 className="text-xl font-semibold mb-6">Diagnostic List</h3>
@@ -19,33 +42,17 @@ export const DiagnosticList = ({ diagnostics }: Props) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            <tr>
-              <td className="py-3 px-4 text-sm text-gray-800">Hypertension</td>
-              <td className="py-3 px-4 text-sm text-gray-600">Chronic high blood pressure</td>
+            {apiDiagnostics.length > 0 ? (apiDiagnostics.map((diag, index) => (
+            <tr key={index}>
+              <td className="py-3 px-4 text-sm text-gray-800">{diag.name}</td>
+              <td className="py-3 px-4 text-sm text-gray-600">{diag.description}</td>
               <td className="py-3 px-4">
-                <span className="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-800">
-                  Under Observation
+                <span className="px-3 py-1 text-sm rounded-full text-gray-600">
+                  {diag.status}
                 </span>
               </td>
             </tr>
-            <tr>
-              <td className="py-3 px-4 text-sm text-gray-800">Type 2 Diabetes</td>
-              <td className="py-3 px-4 text-sm text-gray-600">Insulin resistance and elevated blood sugar</td>
-              <td className="py-3 px-4">
-                <span className="px-3 py-1 text-sm rounded-full bg-green-100 text-green-800">
-                  Cured
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <td className="py-3 px-4 text-sm text-gray-800">Asthma</td>
-              <td className="py-3 px-4 text-sm text-gray-600">Recurrent episodes of bronchial constriction</td>
-              <td className="py-3 px-4">
-                <span className="px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-800">
-                  Inactive
-                </span>
-              </td>
-            </tr>
+            ))):""}
           </tbody>
         </table>
       </div>
