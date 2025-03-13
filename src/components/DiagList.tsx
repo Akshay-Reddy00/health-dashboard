@@ -19,7 +19,7 @@ export const DiagnosticList = ({ diagnostics }: Props) => {
           }
         });
         
-        setApiDiagnostics(res.data[3].diagnostic_list);
+        setApiDiagnostics(res.data[8].diagnostic_list);
         console.log("Diag List: ",res.data[3].diagnostic_list);
       } catch (err) {
         console.error("Error fetching: ", err);
@@ -46,10 +46,8 @@ export const DiagnosticList = ({ diagnostics }: Props) => {
             <tr key={index}>
               <td className="py-3 px-4 text-sm text-gray-800">{diag.name}</td>
               <td className="py-3 px-4 text-sm text-gray-600">{diag.description}</td>
-              <td className="py-3 px-4">
-                <span className="px-3 py-1 text-sm rounded-full text-gray-600">
-                  {diag.status}
-                </span>
+              <td className="py-3 px-4 text-sm text-gray-600">
+              {diag.status}
               </td>
             </tr>
             ))):""}
